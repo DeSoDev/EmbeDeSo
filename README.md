@@ -19,7 +19,10 @@ This means your bitclout node domain has to be hosted on Cloudfare, and you have
 
 It also presumes the frontend and backend are both hosted on the same node.
 
-You dont need workers unbound for this script.
+You dont need Workers Unbound for this script. If your node gets less then 100k visits a day, you can probably run this on the FREE tier. If you have more visits, then for $5 / month your Bundled Workers plan can support upto 10m requests per month. Every additional million costs $0.50 ... just like the first Bitclout ever minted!
+
+[More detail on pricing is here.](https://developers.cloudflare.com/workers/platform/pricing)
+
 
 ## Install this on your Bitclout Domain
 
@@ -139,3 +142,5 @@ Here are some TODOs that you may want to work on.
 * [ ] Filter traffic based on useragent and only run the worker api requests for known embed sources like discord, twitter, slack and search engine spiders.
 
 * [ ] Add caching or KV store for API responses to reduce load on API and increase speed further.
+
+* [ ] Add build script to minifi index.js

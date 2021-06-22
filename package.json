@@ -1,11 +1,11 @@
 {
     "name": "embedclout",
     "version": "0.0.1",
-    "description": "",
+    "description": "Simple cloudflare worker script to enable dynamic embeds for bitclout nodes",
     "scripts": {
     },
-    "main": "index.js",
-    "author": "",
+    "main": "worker/index.js",
+    "author": "tijno",
     "license": "",
     "dependencies": {
     }

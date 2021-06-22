@@ -1,15 +1,3 @@
 type = "javascript"
-workers_dev = false
-name="embedclout"
-
-[dev]
-ip = "0.0.0.0"
-port = 9000
-local_protocol="http"
-upstream_protocol="https"
-
-[env.preview]
 workers_dev = true
-
-[env.production]
-workers_dev = false
+name="embedclout"

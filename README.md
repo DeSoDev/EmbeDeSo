@@ -2,6 +2,15 @@
 
 Easy Cloudflare Workers script that you can add to your Bitclout Node domain to enable proper dynamic title and meta tags and with that get proper URL embeds on all majopr platforms like Discord, Slack & Twitter.
 
+## Warning
+
+Amending the index.js script and worker settings may impact the smooth running of your bitclout node frontend. 
+
+Therefore I recommend you test this setup first one a subdomain of your node domain.
+
+In addition be careful committing or merging changes to the worker/index.js script.
+
+
 ## Dependencies
 
 This script can only be used on Cloudflare workers.
@@ -119,3 +128,14 @@ Also browse your node with a few posts and users to make sure all is fine there 
 Click the `embedclout` worker link on your domain worker dashboard.
 
 Disable the Workers.dev route as you wont need it.
+
+
+## Further improvements
+
+Here are some TODOs that you may want to work on.
+
+* [ ] Support oembed discovery URLs - most of the code for it is there but needs to be updated to support the `url` querystring param
+
+* [ ] Filter traffic based on useragent and only run the worker api requests for known embed sources like discord, twitter, slack and search engine spiders.
+
+* [ ] Add caching or KV store for API responses to reduce load on API and increase speed further.

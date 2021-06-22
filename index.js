@@ -22,7 +22,7 @@ async function handleRequest(req) {
         reqType = path.shift();
     } else {
         //get origin if not oEmbed
-        if (req.hostname.endsWidth('workers.dev')) {
+        if (url.hostname.match(/workers.dev$/)) {
             //workaround for workers web editor because you cant fetch
             //origin in the web editor, and rewrite it.
             return new Response(`workers.dev editor not supported`, {headers: {"content-type": "text/html;charset=UTF-8"}});

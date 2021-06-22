@@ -8,6 +8,7 @@ async function handleRequest(req) {
     const url = new URL(req.url);
     metaData.siteUrl=`${url.protocol}//${url.host}`
     metaData.apiUrl=`${url.protocol}//${url.host}/api/v0`
+    metaData.hostname=`${url.hostname}`
 
     //get path accessed
     const path = url.pathname.split("/");
@@ -157,7 +158,7 @@ class MetaRewriter {
                 element.setAttribute('content', metaData.description)
                 break;
             case "og:site_name":
-                element.setAttribute('content', "tijn.club")
+                element.setAttribute('content', metaData.hostname)
                 break;
             case "og:image":
                 element.setAttribute('content', metaData.image)

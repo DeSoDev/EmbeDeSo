@@ -10,6 +10,8 @@ Therefore I recommend you test this setup first one a subdomain of your node dom
 
 In addition be careful committing or merging changes to the worker/index.js script.
 
+Lastly - you can only run 1 worker with the name `embedclout` in a single cloudflare account. So if you want to apply this to multiple node domains, you just need it ones and configure the routes on each of the domains that point to the worker.
+
 
 ## Dependencies
 
@@ -34,7 +36,24 @@ Go to the CloutEmbed github repo, and fork it.
 
 ![](./fork-repo.png)
 
-### Step 2. Get your Account & Zone ID
+### Step 2. Setup Your Github Secrets
+
+Open the repo `Settings` area in a new browser tab, and then select `Secrets` in the sidebar.
+
+As you will be skipping between this guide here, and your secrets settings its best to use a 2nd browser tab.
+
+Add the following repo secrets -  using Step 3 and 4 below.
+
+* `CF_ZONE_ID`: The ID of the Cloudflare zone for your bitclout domain
+* `CF_ACCOUNT_ID`: Your Cloudflare Account ID
+* `CF_API_TOKEN`: Create a API token
+
+After adding the 3 secrets & the values from the previous steps, it should look like this:
+
+![Secrets](./secrets.png)
+
+
+### Step 3. Get your Account & Zone ID
 
 * Go to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
 * Select the relevant account 
@@ -43,7 +62,7 @@ Go to the CloutEmbed github repo, and fork it.
 
 ![](./get-account-id.png)
 
-#### Step 3. Setup your API key
+#### Step 4. Setup your API key
 
 I recommend you setup a dedicated Cloudflare api token to allow github to deploy the worker script to the specific zone only.
 
@@ -66,31 +85,17 @@ I recommend you setup a dedicated Cloudflare api token to allow github to deploy
 * Copy & safely store the token in your password manager
 
 
-### Step 4. Set secrets on the forked repo
-
-Go to Settings then Secrets.
-
-[Does this link work](./settings/secrets/actions)
-
-Add the following repo secrets
-
-* `CF_ZONE_ID`: The ID of the Cloudflare zone for your bitclout domain
-* `CF_ACCOUNT_ID`: Your Cloudflare Account ID
-* `CF_API_TOKEN`: Create a API token
-
-After adding the 3 secrets & the values from the previous steps, it should look like this:
-
-![Secrets](./secrets.png)
-
 ### Step 5. Deploy
 
 To deploy the worker script to cloudflare:
 
 * Go to the Gitup `Actions` tab for the forked repo.
+* As you forked the repo, accept use of Actions
 * Click the `Deploy` workflow.
 * Click the `Run workflow` button on the right
 * Wait for it to complete
 * If everything has gone ok it should show a green checkmark besides the workflow run
+
 
 ### Step 6. Check the worker is setup
 
@@ -118,7 +123,39 @@ Setup the following 3 routes:
 
 Of course here you use your actual domain rather then `example.com`.
 
-### Step 7. Test
+### Step 7. Update your node index.html file to include some meta tags
+
+When central bitclout adopt EmbedClout, these changes wont be needed as the meta tags will be included in [the node frontend](https://github.com/bitclout/frontend).
+
+Until then, your node index.html file may look something like this:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Welcome to TijnClout</title>      
+    <base href="/" />
+```
+
+Insert the meta tags below in between the `title` and `base` tags.
+
+```html
+    <meta name="description" content="">
+    <meta name="theme-color" content="#7289DA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:site_name" content="" >
+    <meta property='og:image' content="">
+```
+
+You can add default descriptions, titles and sitenames if you want.
+
+If you run your frontend on docker you will need to rebuild the container image, and relaunch it.
+
+
+### Step 8. Test
 
 Go to a discord channel and test a few embeds to make sure its working.
 
@@ -126,7 +163,7 @@ Go to a discord channel and test a few embeds to make sure its working.
 
 Also browse your node with a few posts and users to make sure all is fine there too.
 
-### Step 8. Disable the worker.dev domain
+### Step 9. Disable the worker.dev domain
 
 Click the `embedclout` worker link on your domain worker dashboard.
 

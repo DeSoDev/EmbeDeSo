@@ -109,7 +109,7 @@ The reason for this is that the script needs to fetch the html from the node ori
 
 So if you acccess the worker.dev route that has been setup you will see a "workers.dev editor not supported" message.
 
-### Step 6. Setup the worker routes for your domain
+### Step 7. Setup the worker routes for your domain
 
 Go to  your domain dashboard on cloudflare.
 
@@ -122,7 +122,7 @@ Setup the following 2 routes:
 
 Of course here you use your actual domain rather then `example.com`.
 
-### Step 7. Update your node index.html file to include some meta tags
+### Step 8. Update your node index.html file to include some meta tags
 
 When central bitclout adopt EmbedClout, these changes wont be needed as the meta tags will be included in [the node frontend](https://github.com/bitclout/frontend).
 
@@ -154,7 +154,7 @@ You can add default descriptions, titles and sitenames if you want.
 If you run your frontend on docker you will need to rebuild the container image, and relaunch it.
 
 
-### Step 8. Test
+### Step 9. Test
 
 Go to a discord channel and test a few embeds to make sure its working.
 
@@ -162,7 +162,7 @@ Go to a discord channel and test a few embeds to make sure its working.
 
 Also browse your node with a few posts and users to make sure all is fine there too.
 
-### Step 9. Disable the worker.dev domain
+### Step 10. Disable the worker.dev domain
 
 Click the `embedclout` worker link on your domain worker dashboard.
 

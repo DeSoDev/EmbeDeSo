@@ -115,11 +115,10 @@ Go to  your domain dashboard on cloudflare.
 
 Click the workers tab.
 
-Setup the following 3 routes:
+Setup the following 2 routes:
 
-1. api route to make sure api requests are not routed via the worker:  `example.com/api/*` with `None` as worker.
-2. the user route: `example.com/u/*` and `EmbedClout` as the worker.
-3. the posts route: `example.com/posts/*` and `EmbedClout` as the worker.
+1. the user route: `example.com/u/*` and `EmbedClout` as the worker.
+2. the posts route: `example.com/posts/*` and `EmbedClout` as the worker.
 
 Of course here you use your actual domain rather then `example.com`.
 

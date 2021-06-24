@@ -25,6 +25,15 @@ You dont need Workers Unbound for this script. If your node gets less then 100k 
 
 [More detail on pricing is here.](https://developers.cloudflare.com/workers/platform/pricing)
 
+## Checklist before starting
+
+Please make sure you have done the following:
+
+- [ ] You have a CloudFlare account and you are logged in
+- [ ] Your domain is [added to your Cloudflare account](https://support.cloudflare.com/hc/en-us/articles/360000841472)
+- [ ] Your node is setup on the domain
+- [ ] Your Cloudflare account is [setup up for Workers](https://dash.cloudflare.com/sign-up/workers)
+
 
 ## Install this on your Bitclout Domain
 

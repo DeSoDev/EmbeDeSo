@@ -1,5 +1,16 @@
 //used for info in HTMLRewriter
-const metaData = {}
+const metaData = {
+    siteUrl: "",
+    apiUrl: "",
+    hostname: "",
+    title: "",
+    description: "",
+    username: "",
+    image: "",
+    link: "",
+    path: "",
+
+}
 
 async function handleRequest(req) {
     let res
@@ -53,26 +64,30 @@ async function handleRequest(req) {
         case 'u':
             //this is a request for a user
             content = await getUser(path.shift())
-            price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
-            metaData.title = `${content.Username} (${price} $DESO)`
-            metaData.username = content.Username;
-            metaData.description = content.Description.trim()
-            metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`
+            if ( typeof content.Username !== 'undefined' ) {
+                price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
+                metaData.title = `${content.Username} (${price} $DESO)`
+                metaData.username = content.Username;
+                metaData.description = content.Description.trim()
+                metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
+            } else 
             break;
         case 'posts':
         case 'nft':
             //this is a request for a post or an nft
             content = await getPost(path.shift());
-            const postType = content.IsNFT ? 'Nft' : 'Post';
-            price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
-            metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
-            metaData.username = content.ProfileEntryResponse.Username;
-            if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
-                metaData.image = content.ImageURLs[0];
-            } else {
-                metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}`;
+            if ( typeof content.Body !== 'undefined' ) {
+                const postType = content.IsNFT ? 'Nft' : 'Post';
+                price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
+                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
+                metaData.username = content.ProfileEntryResponse.Username;
+                if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
+                    metaData.image = content.ImageURLs[0];
+                } else {
+                    metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}`;
+                }
+                metaData.description = content.Body.trim().substring(0, 500) + '...';
             }
-            metaData.description = content.Body.trim().substring(0, 500) + '...';
             break;
     }
 
@@ -128,6 +143,9 @@ async function api(path, data) {
     }
     const response = await fetch(url, init)
     const json = response.status == 200 ? await response.json() : { status: response.status, error: response.statusText, body: await response.text() }
+    if ( response.status !== 200 ) {
+        console.log("Node Api Error",url,json.status, json.error, json.body)
+    }
     return json
 }
 

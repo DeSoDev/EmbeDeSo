@@ -1,36 +1,39 @@
-# EmbedClout
+# EmbedDeSo
 
-Easy Cloudflare Workers script that you can add to your Bitclout Node domain to enable proper dynamic title and meta tags and with that get proper URL embeds on all majopr platforms like Discord, Slack & Twitter.
+Easy Cloudflare Workers script that you can add to your DeSo Node domain to enable proper dynamic title and meta tags and with that get proper URL embeds on all majopr platforms like Discord, Slack & Twitter.
+
+[Read more about DeSo](https://deso.org) and [How to Run a Node](http://docs.deso.org/devs/running-a-node).
 
 ## Warning
 
-Amending the index.js script and worker settings may impact the smooth running of your bitclout node frontend. 
+Amending the index.js script and worker settings may impact the smooth running of your DeSo node frontend. 
 
-Therefore I recommend you test this setup first one a subdomain of your node domain.
+Therefore I recommend you test this setup first on a subdomain of your node domain.
 
 In addition be careful committing or merging changes to the worker/index.js script.
 
+This repo includes a github action to enable easy updates of the installed cloudflare worker.
 
 ## Dependencies
 
 This script can only be used on Cloudflare workers.
 
-This means your bitclout node domain has to be hosted on Cloudfare, and you have to have the workers service enabled.
+This means your DeSo node domain has to be hosted on Cloudfare, and you have to have the workers service enabled.
 
 It also presumes the frontend and backend are both hosted on the same node.
 
-You dont need Workers Unbound for this script. If your node gets less then 100k visits a day, you can probably run this on the FREE tier. If you have more visits, then for $5 / month your Bundled Workers plan can support upto 10m requests per month. Every additional million costs $0.50 ... just like the first Bitclout ever minted!
+You dont need Workers Unbound for this script. If your node gets less then 100k visits a day, you can probably run this on the FREE tier. If you have more visits, then for $5 / month your Bundled Workers plan can support upto 10m requests per month. Every additional million costs $0.50 ... just like the first DeSo ever minted!
 
 [More detail on pricing is here.](https://developers.cloudflare.com/workers/platform/pricing)
 
 
-## Install this on your Bitclout Domain
+## Install this on your DeSo Domain
 
-Follow the steps below to setup this Bitclout embed script on your cloudflare workers and your bitclout domain.
+Follow the steps below to setup this DeSo embed script on your cloudflare workers and your DeSo domain.
 
 ### Step 1. Fork this repo
 
-Go to the CloutEmbed github repo, and fork it.
+Go to the [EmbedDeSo github repo](), and fork it.
 
 ![](./fork-repo.png)
 
@@ -57,7 +60,7 @@ I recommend you setup a dedicated Cloudflare api token to allow github to deploy
 
 * Under `Account resources` select the account you are deploying this worker on
 
-* Under `Zone resources` set it to `specific zone` and select your bitclout domain in the dropdown.
+* Under `Zone resources` set it to `specific zone` and select your DeSo node domain in the dropdown.
 
 * Click `continue to summary`
 
@@ -74,7 +77,7 @@ Go to Settings then Secrets.
 
 Add the following repo secrets
 
-* `CF_ZONE_ID`: The ID of the Cloudflare zone for your bitclout domain
+* `CF_ZONE_ID`: The ID of the Cloudflare zone for your DeSo Node domain
 * `CF_ACCOUNT_ID`: Your Cloudflare Account ID
 * `CF_API_TOKEN`: Create a API token
 
@@ -96,7 +99,7 @@ To deploy the worker script to cloudflare:
 
 Go to the workers section for your account.
 
-It should show the `embedclout` worker.
+It should show the `EmbedDeso` worker.
 
 It should also have been deployed on the workers.dev route - but this wont actually do anything.
 
@@ -113,8 +116,8 @@ Click the workers tab.
 Setup the following 3 routes:
 
 1. api route to make sure api requests are not routed via the worker:  `example.com/api/*` with `None` as worker.
-2. the user route: `example.com/u/*` and `EmbedClout` as the worker.
-3. the posts route: `example.com/posts/*` and `EmbedClout` as the worker.
+2. the user route: `example.com/u/*` and `EmbedDeSo` as the worker.
+3. the posts route: `example.com/posts/*` and `EmbedDeSo` as the worker.
 
 Of course here you use your actual domain rather then `example.com`.
 
@@ -128,7 +131,7 @@ Also browse your node with a few posts and users to make sure all is fine there 
 
 ### Step 8. Disable the worker.dev domain
 
-Click the `embedclout` worker link on your domain worker dashboard.
+Click the `EmbedDeSo` worker link on your domain worker dashboard.
 
 Disable the Workers.dev route as you wont need it.
 
@@ -136,6 +139,10 @@ Disable the Workers.dev route as you wont need it.
 ## Further improvements
 
 Here are some TODOs that you may want to work on.
+
+* [ ] Add support for NFT urls
+
+* [ ] Improve embedding of image posts.
 
 * [ ] Support oembed discovery URLs - most of the code for it is there but needs to be updated to support the `url` querystring param
 

@@ -16,7 +16,7 @@ async function handleRequest(req) {
     let reqType = path.shift();
 
     //script supports oembed json discovery, but currently not much
-    //benefit of this for bitclout
+    //benefit of this for DeSo Nodes
     const oEmbed = reqType == 'oembed';
     if (oEmbed) {
         //TODO: oembed may require `url` query string param and we should use that to parse
@@ -43,8 +43,8 @@ async function handleRequest(req) {
         case 'u':
             //this is a request for a user
             content = await getUser(path.shift())
-            const price = Math.floor(content.CoinPriceBitCloutNanos / 1e9)
-            metaData.title = `${content.Username} (${price} $clout)`
+            const price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
+            metaData.title = `${content.Username} (${price} $DESO)`
             metaData.username = content.Username;
             metaData.description = content.Description.trim()
             metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`
@@ -67,10 +67,10 @@ async function handleRequest(req) {
             title: metaData.title,
             author_name: metaData.username,
             author_url: `${metaData.siteUrl}/u/${metaData.username}`,
-            provider_name: 'BitClout',
+            provider_name: 'DeSo',
             provider_url: metaData.siteUrl,
             cache_age: 3600,
-            thumbnail_url: `${metaData.siteUrl}/assets/img/cloutlogo.svg`,
+            thumbnail_url: `${metaData.siteUrl}/assets/img/desologo.svg`,
             thumbnail_width: 704,
             thumbnail_height: 801
         }

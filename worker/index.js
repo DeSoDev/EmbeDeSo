@@ -1,13 +1,40 @@
 //used for info in HTMLRewriter
-const metaData = {}
+const metaData = {
+    siteUrl: "",
+    apiUrl: "",
+    hostname: "",
+    title: "",
+    description: "",
+    username: "",
+    image: "",
+    link: "",
+    path: "",
+
+}
 
 async function handleRequest(req) {
     let res
 
     //get path
     const url = new URL(req.url);
+
+    // replace req hostname to a node in case of running this in dev mode using `workers dev` command.
+    let workerdev = false;
+    if (url.hostname.match(/workers.dev$/)) {
+        workerdev=true;
+        url.hostname='tijn.club'
+    }
+
+    //check if env variable with api domain is set
+    //this is done for situations where you are running node on separate domain from frontend
+    let apiHost = url.host
+    if ( typeof NODEAPI !== 'undefined' && NODEAPI !== "" ) {
+        apiHost = NODEAPI
+    }
+
+    //prepare metadata
     metaData.siteUrl=`${url.protocol}//${url.host}`
-    metaData.apiUrl=`${url.protocol}//${url.host}/api/v0`
+    metaData.apiUrl=`${url.protocol}//${apiHost}/api/v0`
     metaData.hostname=`${url.hostname}`
 
     //get path accessed
@@ -21,17 +48,10 @@ async function handleRequest(req) {
     if (oEmbed) {
         //TODO: oembed may require `url` query string param and we should use that to parse
         reqType = path.shift();
-    } else {
-        //get origin if not oEmbed
-        if (url.hostname.match(/workers.dev$/)) {
-            //workaround for workers web editor because you cant fetch
-            //origin in the web editor, and rewrite it.
-            return new Response(`workers.dev editor not supported`, {headers: {"content-type": "text/html;charset=UTF-8"}});
-        } else {
-            //fetch the origin so we can rewrite the html later
-            res = await fetch(req);
         }
-    }
+    
+    //fetch the origin, or the dummy URL from worker dev 
+    res = await fetch(url.toString(), req);
 
     //for users & posts - fetch data from the api & transform the returned html
     let content
@@ -39,27 +59,41 @@ async function handleRequest(req) {
     metaData.path = url.pathname
 
     //get correct meta data for each page type
+    let price
     switch (reqType) {
         case 'u':
-            //this is a request for a user
+            //this is a request for a user - Profile
             content = await getUser(path.shift())
-            const price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
-            metaData.title = `${content.Username} (${price} $DESO)`
-            metaData.username = content.Username;
-            metaData.description = content.Description.trim()
-            metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`
+            if ( 'Profile' in content ) {
+                content = content.Profile;
+                price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
+                metaData.title = `${content.Username} (${price} $DESO)`
+                metaData.username = content.Username;
+                metaData.description = content.Description.trim()
+                metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
+            }
             break;
         case 'posts':
-            //this is a request for a post
-            content = await getPost(path.shift())
-            metaData.title = `${content.Body.substring(0, 50)} by ${content.ProfileEntryResponse.Username}`
-            metaData.username = content.ProfileEntryResponse.Username;
-            metaData.description = content.Body.trim().substring(0, 280)
-            metaData.image = content.ImageURLs == null ? `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}` : content.ImageURLs[0]
+        case 'nft':
+            //this is a request for a post or an nft - PostFound
+            content = await getPost(path.shift());
+            if ( 'PostFound' in content ) {
+                content = content.PostFound;
+                const postType = content.IsNFT ? 'Nft' : 'Post';
+                price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
+                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
+                metaData.username = content.ProfileEntryResponse.Username;
+                if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
+                    metaData.image = content.ImageURLs[0];
+                } else {
+                    metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}`;
+                }
+                metaData.description = content.Body.trim().substring(0, 500) + '...';
+            }
             break;
     }
 
-    if (oEmbed) {
+    if (oEmbed || workerdev) {
         //prepare data
         const data = {
             type: 'link',
@@ -76,11 +110,16 @@ async function handleRequest(req) {
         }
 
         //if post with image
-        if (reqType == 'post' && content.ImageURLs && content.ImageURLs.length > 0) {
+        if ( (reqType == 'posts' || reqType == 'nft') && content.ImageURLs && content.ImageURLs.length > 0) {
             data.type = 'photo';
             data.url = content.ImageURLs[0];
             data.width = 500;
             data.height = 300;
+        }
+
+        // if this is running on worker dev, then just add the metaData object to the json output for debugging
+        if ( workerdev ) {
+            data.metaData = metaData;
         }
 
         //return embed json response
@@ -106,6 +145,9 @@ async function api(path, data) {
     }
     const response = await fetch(url, init)
     const json = response.status == 200 ? await response.json() : { status: response.status, error: response.statusText, body: await response.text() }
+    if ( response.status !== 200 ) {
+        console.log("Node Api Error",url,json.status, json.error, json.body)
+    }
     return json
 }
 
@@ -114,7 +156,7 @@ async function getUser(id) {
         PublicKeyBase58Check: '',
         Username: id
     })
-    return data.Profile
+    return data
 }
 
 async function getPost(id) {
@@ -126,7 +168,7 @@ async function getPost(id) {
         CommentLimit: 0,
         CommentOffset: 0
     })
-    return data.PostFound
+    return data
 }
 
 class ElementRewriter {
@@ -147,7 +189,10 @@ class MetaRewriter {
         switch (element.getAttribute('name')) {
             case "description":
                 //TODO: Make this substring smarter
-                element.setAttribute('content', metaData.description.substring(0, 170))
+                element.setAttribute('content', metaData.description.substring(0, 300))
+                break;
+            case "twitter:image":
+                element.setAttribute('content', metaData.image);
                 break;
         }
         switch (element.getAttribute('property')) {

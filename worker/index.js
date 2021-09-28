@@ -17,7 +17,7 @@ async function handleRequest(req) {
     //check if env variable with api domain is set
     //this is done for situations where you are running node on separate domain from frontend
     let apiHost = url.host
-    if ( NODEAPI && NODEAPI!="" ) {
+    if ( typeof NODEAPI !== 'undefined' && NODEAPI !== "" ) {
         apiHost = NODEAPI
     }
 

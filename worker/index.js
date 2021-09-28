@@ -52,12 +52,19 @@ async function handleRequest(req) {
             metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`
             break;
         case 'posts':
-            //this is a request for a post
-            content = await getPost(path.shift())
-            metaData.title = `${content.Body.substring(0, 50)} by ${content.ProfileEntryResponse.Username}`
+        case 'nft':
+            //this is a request for a post or an nft
+            content = await getPost(path.shift());
+            const postType = content.IsNFT ? 'Nft' : 'Post';
+            const firstLine = content.Body.split("\n")[0];
+            metaData.title = `${postType} by @${content.ProfileEntryResponse.Username}: "${firstLine.substring(0, 45)}..."`;
             metaData.username = content.ProfileEntryResponse.Username;
-            metaData.description = content.Body.trim().substring(0, 280)
-            metaData.image = content.ImageURLs == null ? `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}` : content.ImageURLs[0]
+            if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
+                metaData.image = content.ImageURLs[0];
+            } else {
+                metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}`;
+            }
+            metaData.description = content.Body.trim().substring(0, 500) + '...';
             break;
     }
 
@@ -78,7 +85,7 @@ async function handleRequest(req) {
         }
 
         //if post with image
-        if (reqType == 'post' && content.ImageURLs && content.ImageURLs.length > 0) {
+        if ( (reqType == 'posts' || reqType == 'nft') && content.ImageURLs && content.ImageURLs.length > 0) {
             data.type = 'photo';
             data.url = content.ImageURLs[0];
             data.width = 500;
@@ -154,7 +161,7 @@ class MetaRewriter {
         switch (element.getAttribute('name')) {
             case "description":
                 //TODO: Make this substring smarter
-                element.setAttribute('content', metaData.description.substring(0, 170))
+                element.setAttribute('content', metaData.description.substring(0, 300))
                 break;
         }
         switch (element.getAttribute('property')) {

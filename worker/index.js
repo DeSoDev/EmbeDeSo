@@ -6,6 +6,15 @@ async function handleRequest(req) {
 
     //get path
     const url = new URL(req.url);
+
+    // replace req hostname to a node in case of running this in dev mode using `workers dev` command.
+    let workerdev = false;
+    if (url.hostname.match(/workers.dev$/)) {
+        workerdev=true;
+        url.hostname='tijn.club'
+    }
+
+    //prepare metadata
     metaData.siteUrl=`${url.protocol}//${url.host}`
     metaData.apiUrl=`${url.protocol}//${url.host}/api/v0`
     metaData.hostname=`${url.hostname}`
@@ -21,17 +30,10 @@ async function handleRequest(req) {
     if (oEmbed) {
         //TODO: oembed may require `url` query string param and we should use that to parse
         reqType = path.shift();
-    } else {
-        //get origin if not oEmbed
-        if (url.hostname.match(/workers.dev$/)) {
-            //workaround for workers web editor because you cant fetch
-            //origin in the web editor, and rewrite it.
-            return new Response(`workers.dev editor not supported`, {headers: {"content-type": "text/html;charset=UTF-8"}});
-        } else {
-            //fetch the origin so we can rewrite the html later
-            res = await fetch(req);
         }
-    }
+    
+    //fetch the origin, or the dummy URL from worker dev 
+    res = await fetch(url.toString(), req);
 
     //for users & posts - fetch data from the api & transform the returned html
     let content
@@ -59,7 +61,7 @@ async function handleRequest(req) {
             break;
     }
 
-    if (oEmbed) {
+    if (oEmbed || workerdev) {
         //prepare data
         const data = {
             type: 'link',
@@ -81,6 +83,11 @@ async function handleRequest(req) {
             data.url = content.ImageURLs[0];
             data.width = 500;
             data.height = 300;
+        }
+
+        // if this is running on worker dev, then just add the metaData object to the json output for debugging
+        if ( workerdev ) {
+            data.metaData = metaData;
         }
 
         //return embed json response

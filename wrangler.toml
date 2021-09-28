@@ -2,3 +2,10 @@ type = "javascript"
 workers_dev = true
 name="embedeso"
 compatibility_date = "2021-09-28"
+
+# custom settnings for muy domain, dont PR these to main repo
+account_id="042187d5cfd39e18cd8d3f3c4d31aa47"
+routes = ["cf.tijn.club/u/*","cf.tijn.club/posts/*","cf.tijn.club/nft/*"]
+
+[vars]
+NODEAPI="api.tijn.club"

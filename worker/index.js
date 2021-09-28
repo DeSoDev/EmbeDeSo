@@ -64,7 +64,7 @@ async function handleRequest(req) {
         case 'u':
             //this is a request for a user
             content = await getUser(path.shift())
-            if ( typeof content.Username !== 'undefined' ) {
+            if ( 'Username' in content ) {
                 price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
                 metaData.title = `${content.Username} (${price} $DESO)`
                 metaData.username = content.Username;
@@ -76,7 +76,7 @@ async function handleRequest(req) {
         case 'nft':
             //this is a request for a post or an nft
             content = await getPost(path.shift());
-            if ( typeof content.Body !== 'undefined' ) {
+            if ( 'Body' in content ) {
                 const postType = content.IsNFT ? 'Nft' : 'Post';
                 price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
                 metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;

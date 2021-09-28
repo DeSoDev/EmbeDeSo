@@ -62,21 +62,23 @@ async function handleRequest(req) {
     let price
     switch (reqType) {
         case 'u':
-            //this is a request for a user
+            //this is a request for a user - Profile
             content = await getUser(path.shift())
-            if ( 'Username' in content ) {
+            if ( 'Profile' in content ) {
+                content = content.Profile;
                 price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
                 metaData.title = `${content.Username} (${price} $DESO)`
                 metaData.username = content.Username;
                 metaData.description = content.Description.trim()
                 metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
-            } else 
+            }
             break;
         case 'posts':
         case 'nft':
-            //this is a request for a post or an nft
+            //this is a request for a post or an nft - PostFound
             content = await getPost(path.shift());
-            if ( 'Body' in content ) {
+            if ( 'PostFound' in content ) {
+                content = content.PostFound;
                 const postType = content.IsNFT ? 'Nft' : 'Post';
                 price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
                 metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
@@ -154,7 +156,7 @@ async function getUser(id) {
         PublicKeyBase58Check: '',
         Username: id
     })
-    return data.Profile
+    return data
 }
 
 async function getPost(id) {
@@ -166,7 +168,7 @@ async function getPost(id) {
         CommentLimit: 0,
         CommentOffset: 0
     })
-    return data.PostFound
+    return data
 }
 
 class ElementRewriter {

@@ -48,11 +48,12 @@ async function handleRequest(req) {
     metaData.path = url.pathname
 
     //get correct meta data for each page type
+    let price
     switch (reqType) {
         case 'u':
             //this is a request for a user
             content = await getUser(path.shift())
-            const price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
+            price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
             metaData.title = `${content.Username} (${price} $DESO)`
             metaData.username = content.Username;
             metaData.description = content.Description.trim()
@@ -63,8 +64,8 @@ async function handleRequest(req) {
             //this is a request for a post or an nft
             content = await getPost(path.shift());
             const postType = content.IsNFT ? 'Nft' : 'Post';
-            const firstLine = content.Body.split("\n")[0];
-            metaData.title = `${postType} by @${content.ProfileEntryResponse.Username}: "${firstLine.substring(0, 45)}..."`;
+            price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
+            metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
             metaData.username = content.ProfileEntryResponse.Username;
             if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
                 metaData.image = content.ImageURLs[0];
@@ -169,6 +170,9 @@ class MetaRewriter {
             case "description":
                 //TODO: Make this substring smarter
                 element.setAttribute('content', metaData.description.substring(0, 300))
+                break;
+            case "twitter:image":
+                element.setAttribute('content', metaData.image);
                 break;
         }
         switch (element.getAttribute('property')) {

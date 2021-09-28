@@ -1,6 +1,6 @@
 # EmbeDeSo
 
-Easy Cloudflare Workers script that you can add to your DeSo Node domain to enable proper dynamic title and meta tags and with that get proper URL embeds on all majopr platforms like Discord, Slack & Twitter.
+Easy Cloudflare Workers script that you can add to your DeSo Node domain to enable proper dynamic title and meta tags and with that get proper SEO content as well as URL embeds on all major platforms like Discord, Slack & Twitter.
 
 [Read more about DeSo](https://deso.org) and [How to Run a Node](http://docs.deso.org/devs/running-a-node).
 
@@ -20,11 +20,15 @@ Lastly - you can only run 1 worker with the name `EmbeDeSo` in a single cloudfla
 
 This script can only be used on Cloudflare workers.
 
-This means your DeSo node domain has to be hosted on Cloudfare, and you have to have the workers service enabled.
+This means your DeSo frontend node domain  has to be hosted on Cloudfare, and you have to have the workers service enabled.
 
-It also presumes the frontend and backend are both hosted on the same node.
+With the default config, it also presumes the frontend and backend are both hosted on the same node. This script will make requests to your node api to get the required information for the html head.
 
-You dont need Workers Unbound for this script. If your node gets less then 100k visits a day, you can probably run this on the FREE tier. If you have more visits, then for $5 / month your Bundled Workers plan can support upto 10m requests per month. Every additional million costs $0.50 ... just like the first DeSo ever minted!
+You dont need Workers Unbound for this script. 
+
+If your node gets less then 100k visits a day, you can probably run this on the FREE tier. 
+
+If you have more visits, then for $5 / month your Bundled Workers plan can support upto 10m requests per month. Every additional million costs $0.50 ... just like the first DeSo ever minted!
 
 [More detail on pricing is here.](https://developers.cloudflare.com/workers/platform/pricing)
 
@@ -117,11 +121,11 @@ Go to the workers section for your account.
 
 It should show the `EmbeDeso` worker.
 
-It should also have been deployed on the workers.dev route - but this wont actually do anything.
+It should also have been deployed on the workers.dev route - but this wont actually do anything besides helping you debug issues.
 
 The reason for this is that the script needs to fetch the html from the node origin.
 
-So if you acccess the worker.dev route that has been setup you will see a "workers.dev editor not supported" message.
+The script therefore includes a check to define a custom hostname to replace the worker domain with, and it will just output JSON from the workers.dev domain.
 
 **Is your frontend domain is different then your api domain?**
 
@@ -135,46 +139,27 @@ Go to  your domain dashboard on cloudflare.
 
 Click the workers tab.
 
-Setup the following 2 routes:
+Setup the following 3 routes:
 
-1. api route to make sure api requests are not routed via the worker:  `example.com/api/*` with `None` as worker.
-2. the User route: `example.com/u/*` and `EmbeDeSo` as the worker.
-3. the Posts route: `example.com/posts/*` and `EmbeDeSo` as the worker.
-4. the Nft route: `example.com/nft/*` and `EmbeDeSo` as the worker.
+1. the User route: `example.com/u/*` and `EmbeDeSo` as the worker.
+2. the Posts route: `example.com/posts/*` and `EmbeDeSo` as the worker.
+3. the Nft route: `example.com/nft/*` and `EmbeDeSo` as the worker.
 
 Of course here you use your actual domain rather then `example.com`.
 
 ### Step 8. Update your node index.html file to include some meta tags
 
-When central bitclout adopt EmbedClout, these changes wont be needed as the meta tags will be included in [the node frontend](https://github.com/bitclout/frontend).
+Your DeSo front end should already include the required html tags. But if you are running with a custom front end, or want to use this script on a different frontend then the reference DeSo one, then make sure these tags exist in the head section:
 
-Until then, your node index.html file may look something like this:
-
-```html
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="referrer" content="no-referrer" />
-    <title>Welcome to TijnClout</title>      
-    <base href="/" />
-```
-
-Insert the meta tags below in between the `title` and `base` tags.
-
-```html
-    <meta name="description" content="">
-    <meta name="theme-color" content="#7289DA">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="og:title" content="">
-    <meta property="og:description" content="">
-    <meta property="og:site_name" content="" >
-    <meta property='og:image' content="">
-```
+* title
+* meta name description
+* meta name twitter:image
+* meta property og:title
+* meta property og:description
+* meta property og:site_name
+* meta property og:image
 
 You can add default descriptions, titles and sitenames if you want.
-
-If you run your frontend on docker you will need to rebuild the container image, and relaunch it.
-
 
 ### Step 9. Test
 
@@ -195,9 +180,9 @@ Disable the Workers.dev route as you wont need it.
 
 Here are some TODOs that you may want to work on.
 
-* [ ] Add support for NFT urls
+* [X] Add support for NFT urls
 
-* [ ] Improve embedding of image posts.
+* [X] Improve embedding of image posts.
 
 * [ ] Support oembed discovery URLs - most of the code for it is there but needs to be updated to support the `url` querystring param
 

@@ -1,4 +1,4 @@
-# EmbedDeSo
+# EmbeDeSo
 
 Easy Cloudflare Workers script that you can add to your DeSo Node domain to enable proper dynamic title and meta tags and with that get proper URL embeds on all majopr platforms like Discord, Slack & Twitter.
 
@@ -14,7 +14,7 @@ In addition be careful committing or merging changes to the worker/index.js scri
 
 This repo includes a github action to enable easy updates of the installed cloudflare worker.
 
-Lastly - you can only run 1 worker with the name `EmbedDeSo` in a single cloudflare account. So if you want to apply this to multiple node domains, you just need it ones and configure the routes on each of the domains that point to the worker.
+Lastly - you can only run 1 worker with the name `EmbeDeSo` in a single cloudflare account. So if you want to apply this to multiple node domains, you just need it ones and configure the routes on each of the domains that point to the worker.
 
 ## Dependencies
 
@@ -32,10 +32,10 @@ You dont need Workers Unbound for this script. If your node gets less then 100k 
 
 Please make sure you have done the following:
 
-- [ ] You have a CloudFlare account and you are logged in
-- [ ] Your domain is [added to your Cloudflare account](https://support.cloudflare.com/hc/en-us/articles/360000841472)
-- [ ] Your node is setup on the domain
-- [ ] Your Cloudflare account is [setup up for Workers](https://dash.cloudflare.com/sign-up/workers)
+- ✅ You have a CloudFlare account and you are logged in
+- ✅ Your domain is [added to your Cloudflare account](https://support.cloudflare.com/hc/en-us/articles/360000841472)
+- ✅ Your node is setup on the domain
+- ✅ Your Cloudflare account is [setup up for Workers](https://dash.cloudflare.com/sign-up/workers)
 
 
 ## Install this on your DeSo Domain
@@ -44,7 +44,7 @@ Follow the steps below to setup this DeSo embed script on your cloudflare worker
 
 ### Step 1. Fork this repo
 
-Go to the [EmbedDeSo github repo](), and fork it.
+Go to the [EmbeDeSo github repo](https://github.com/DeSoDev/EmbeDeSo), and fork it.
 
 ![](./fork-repo.png)
 
@@ -74,7 +74,7 @@ After adding the 3 secrets & the values from the previous steps, it should look 
 
 ![](./get-account-id.png)
 
-#### Step 4. Setup your API key
+### Step 4. Setup your API key
 
 I recommend you setup a dedicated Cloudflare api token to allow github to deploy the worker script to the specific zone only.
 
@@ -83,6 +83,8 @@ I recommend you setup a dedicated Cloudflare api token to allow github to deploy
 * Click 'Create Token'.
 
 * Click `Use Template` for the `Edit Cloudflare Workers` row
+
+* Click the edit button next to `token name` and enter a clear title, eg "EmbeDeSo Github Action"
 
 * Leave the permissions as is
 
@@ -95,21 +97,6 @@ I recommend you setup a dedicated Cloudflare api token to allow github to deploy
 * Click `Create Token`
 
 * Copy & safely store the token in your password manager
-
-
-### Step 4. Set secrets on the forked repo
-
-Go to Settings then Secrets.
-
-Add the following repo secrets
-
-* `CF_ZONE_ID`: The ID of the Cloudflare zone for your DeSo Node domain
-* `CF_ACCOUNT_ID`: Your Cloudflare Account ID
-* `CF_API_TOKEN`: Create a API token
-
-After adding the 3 secrets & the values from the previous steps, it should look like this:
-
-![Secrets](./secrets.png)
 
 
 ### Step 5. Deploy
@@ -128,7 +115,7 @@ To deploy the worker script to cloudflare:
 
 Go to the workers section for your account.
 
-It should show the `EmbedDeso` worker.
+It should show the `EmbeDeso` worker.
 
 It should also have been deployed on the workers.dev route - but this wont actually do anything.
 
@@ -145,8 +132,9 @@ Click the workers tab.
 Setup the following 2 routes:
 
 1. api route to make sure api requests are not routed via the worker:  `example.com/api/*` with `None` as worker.
-2. the user route: `example.com/u/*` and `EmbedDeSo` as the worker.
-3. the posts route: `example.com/posts/*` and `EmbedDeSo` as the worker.
+2. the User route: `example.com/u/*` and `EmbeDeSo` as the worker.
+3. the Posts route: `example.com/posts/*` and `EmbeDeSo` as the worker.
+4. the Nft route: `example.com/nft/*` and `EmbeDeSo` as the worker.
 
 Of course here you use your actual domain rather then `example.com`.
 
@@ -192,7 +180,7 @@ Also browse your node with a few posts and users to make sure all is fine there 
 
 ### Step 10. Disable the worker.dev domain
 
-Click the `EmbedDeSo` worker link on your domain worker dashboard.
+Click the `EmbeDeSo` worker link on your domain worker dashboard.
 
 Disable the Workers.dev route as you wont need it.
 

@@ -1,4 +1,4 @@
 type = "javascript"
 workers_dev = true
-name="embeddeso"
+name="embedeso"
 compatibility_date = "2021-09-28"

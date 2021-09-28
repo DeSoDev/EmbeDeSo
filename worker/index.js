@@ -14,9 +14,16 @@ async function handleRequest(req) {
         url.hostname='tijn.club'
     }
 
+    //check if env variable with api domain is set
+    //this is done for situations where you are running node on separate domain from frontend
+    let apiHost = url.host
+    if ( NODEAPI && NODEAPI!="" ) {
+        apiHost = NODEAPI
+    }
+
     //prepare metadata
     metaData.siteUrl=`${url.protocol}//${url.host}`
-    metaData.apiUrl=`${url.protocol}//${url.host}/api/v0`
+    metaData.apiUrl=`${url.protocol}//${apiHost}/api/v0`
     metaData.hostname=`${url.hostname}`
 
     //get path accessed

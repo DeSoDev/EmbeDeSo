@@ -123,6 +123,12 @@ The reason for this is that the script needs to fetch the html from the node ori
 
 So if you acccess the worker.dev route that has been setup you will see a "workers.dev editor not supported" message.
 
+**Is your frontend domain is different then your api domain?**
+
+You will need to go to the worker settings tab, and add an `NODEAPI` environment variable:
+
+![NODEAPI Env Variable](./envvar.png)
+
 ### Step 7. Setup the worker routes for your domain
 
 Go to  your domain dashboard on cloudflare.

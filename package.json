@@ -1,12 +1,12 @@
 {
-    "name": "embedclout",
-    "version": "0.0.1",
-    "description": "Simple cloudflare worker script to enable dynamic embeds for bitclout nodes",
+    "name": "EmbedDeSo",
+    "version": "0.0.2",
+    "description": "Simple cloudflare worker script to enable dynamic embeds for DeSo nodes",
     "scripts": {
     },
     "main": "worker/index.js",
     "author": "tijno",
-    "license": "",
+    "license": "MIT",
     "dependencies": {
     }
 }

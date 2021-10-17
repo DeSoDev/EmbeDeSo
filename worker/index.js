@@ -59,15 +59,16 @@ async function handleRequest(req) {
     metaData.path = url.pathname
 
     //get correct meta data for each page type
-    let price
+    let desoPrice
     switch (reqType) {
         case 'u':
             //this is a request for a user - Profile
             content = await getUser(path.shift())
             if ( 'Profile' in content ) {
                 content = content.Profile;
-                price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
-                metaData.title = `${content.Username} (${price} $DESO)`
+                desoPrice = Math.floor(content.CoinPriceDeSoNanos / 1e9)
+                const usdPrice = getUsdPrice(desoPrice)
+                metaData.title = `${content.Username} ($${usdPrice})`
                 metaData.username = content.Username;
                 metaData.description = content.Description.trim()
                 metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
@@ -80,8 +81,9 @@ async function handleRequest(req) {
             if ( 'PostFound' in content ) {
                 content = content.PostFound;
                 const postType = content.IsNFT ? 'Nft' : 'Post';
-                price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
-                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
+                desoPrice = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
+                const usdPrice = getUsdPrice(desoPrice)
+                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} ($${usdPrice})`;
                 metaData.username = content.ProfileEntryResponse.Username;
                 if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
                     metaData.image = content.ImageURLs[0];
@@ -169,6 +171,16 @@ async function getPost(id) {
         CommentOffset: 0
     })
     return data
+}
+
+function getUsdPrice(desoPrice) {
+    const exchangeRate = getUSDCentsPerDesoExchangeRate()
+    return desoPrice * exchangeRate / 100
+}
+
+async function getUSDCentsPerDesoExchangeRate() {
+    const data = await api('get-exchange-rate')
+    return data.ExchangeUSDCentsPerDeSo
 }
 
 class ElementRewriter {

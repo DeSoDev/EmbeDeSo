@@ -59,15 +59,13 @@ async function handleRequest(req) {
     metaData.path = url.pathname
 
     //get correct meta data for each page type
-    let price
     switch (reqType) {
         case 'u':
             //this is a request for a user - Profile
             content = await getUser(path.shift())
             if ( 'Profile' in content ) {
                 content = content.Profile;
-                price = Math.floor(content.CoinPriceDeSoNanos / 1e9)
-                metaData.title = `${content.Username} (${price} $DESO)`
+                metaData.title = `${content.Username}`
                 metaData.username = content.Username;
                 metaData.description = content.Description.trim()
                 metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
@@ -80,8 +78,7 @@ async function handleRequest(req) {
             if ( 'PostFound' in content ) {
                 content = content.PostFound;
                 const postType = content.IsNFT ? 'Nft' : 'Post';
-                price = Math.floor(content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9)
-                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price} $DESO)`;
+                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username}`;
                 metaData.username = content.ProfileEntryResponse.Username;
                 if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
                     metaData.image = content.ImageURLs[0];

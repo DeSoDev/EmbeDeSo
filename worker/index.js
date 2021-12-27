@@ -85,7 +85,7 @@ async function handleRequest(req) {
                 } else {
                     metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.ProfileEntryResponse.PublicKeyBase58Check}`;
                 }
-                metaData.description = content.Body.trim().substring(0, 500) + '...';
+                metaData.description = Array.from(content.Body.trim()).slice(0, 500).join('') + '...';
             }
             break;
     }
@@ -185,8 +185,7 @@ class MetaRewriter {
     element(element) {
         switch (element.getAttribute('name')) {
             case "description":
-                //TODO: Make this substring smarter
-                element.setAttribute('content', metaData.description.substring(0, 300))
+                element.setAttribute('content', metaData.description)
                 break;
             case "twitter:image":
                 element.setAttribute('content', metaData.image);

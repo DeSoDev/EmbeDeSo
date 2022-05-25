@@ -82,8 +82,8 @@ async function handleRequest(req) {
             if ( 'PostFound' in content ) {
                 content = content.PostFound;
                 const postType = content.IsNFT ? 'Nft' : 'Post';
-                desoPrice = content.CoinPriceDeSoNanos / 1e9
-                const usdPrice = await getUsdPrice(desoPrice)
+                desoPrice = content.ProfileEntryResponse.CoinPriceDeSoNanos / 1e9
+                usdPrice = await getUsdPrice(desoPrice)
                 const price = usdPrice>0 ? `$${Math.floor(usdPrice)}` : `${Math.floor(desoPrice)} DESO`
                 metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price})`;
                 metaData.username = content.ProfileEntryResponse.Username;

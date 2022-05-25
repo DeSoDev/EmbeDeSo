@@ -59,13 +59,17 @@ async function handleRequest(req) {
     metaData.path = url.pathname
 
     //get correct meta data for each page type
+    let desoPrice = 0, usdPrice = 0
     switch (reqType) {
         case 'u':
             //this is a request for a user - Profile
             content = await getUser(path.shift())
             if ( 'Profile' in content ) {
                 content = content.Profile;
-                metaData.title = `${content.Username}`
+                desoPrice = content.CoinPriceDeSoNanos / 1e9
+                usdPrice = await getUsdPrice(desoPrice)
+                const price = usdPrice>0 ? `$${Math.floor(usdPrice)}` : `${Math.floor(desoPrice)} DESO`
+                metaData.title = `${content.Username} (${price})`
                 metaData.username = content.Username;
                 metaData.description = Array.from(content.Description.trim()).slice(0, 500).join('') + '...';
                 metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
@@ -78,7 +82,10 @@ async function handleRequest(req) {
             if ( 'PostFound' in content ) {
                 content = content.PostFound;
                 const postType = content.IsNFT ? 'Nft' : 'Post';
-                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username}`;
+                desoPrice = content.CoinPriceDeSoNanos / 1e9
+                const usdPrice = await getUsdPrice(desoPrice)
+                const price = usdPrice>0 ? `$${Math.floor(usdPrice)}` : `${Math.floor(desoPrice)} DESO`
+                metaData.title = `${postType} by @${content.ProfileEntryResponse.Username} (${price})`;
                 metaData.username = content.ProfileEntryResponse.Username;
                 if ( content.ImageURLs && content.ImageURLs.length > 0 ) {
                     metaData.image = content.ImageURLs[0];
@@ -117,6 +124,8 @@ async function handleRequest(req) {
         // if this is running on worker dev, then just add the metaData object to the json output for debugging
         if ( workerdev ) {
             data.metaData = metaData;
+            data.metaData.usdPrice = usdPrice
+            data.metaData.desoPrice = desoPrice
         }
 
         //return embed json response
@@ -131,14 +140,16 @@ async function handleRequest(req) {
     }
 }
 
-async function api(path, data) {
+async function api(path, data, method="POST") {
     const url = `${metaData.apiUrl}/${path}`
     const init = {
-        method: "POST",
+        method: method,
         headers: {
             "content-type": "application/json",
-        },
-        body: JSON.stringify(data)
+        }
+    }
+    if ( method == "POST" ) {
+        init.body=JSON.stringify(data)
     }
     const response = await fetch(url, init)
     const json = response.status == 200 ? await response.json() : { status: response.status, error: response.statusText, body: await response.text() }
@@ -166,6 +177,17 @@ async function getPost(id) {
         CommentOffset: 0
     })
     return data
+}
+
+async function getUsdPrice(deso) {
+    const exchangeRate = await getUSDCentsPerDesoExchangeRate()
+    return deso * exchangeRate / 100
+}
+
+async function getUSDCentsPerDesoExchangeRate() {
+    //TODO: implement KV store caching of exchange rate so we dont need to maker fetch on each load
+    const data = await api('get-exchange-rate',{},"GET")
+    return data.USDCentsPerDeSoExchangeRate
 }
 
 class ElementRewriter {

@@ -67,7 +67,7 @@ async function handleRequest(req) {
                 content = content.Profile;
                 metaData.title = `${content.Username}`
                 metaData.username = content.Username;
-                metaData.description = content.Description.trim()
+                metaData.description = Array.from(content.Description.trim()).slice(0, 500).join('') + '...';
                 metaData.image = `${metaData.apiUrl}/get-single-profile-picture/${content.PublicKeyBase58Check}`    
             }
             break;
@@ -185,6 +185,7 @@ class MetaRewriter {
     element(element) {
         switch (element.getAttribute('name')) {
             case "description":
+                //TODO: Make this substring smarter
                 element.setAttribute('content', metaData.description)
                 break;
             case "twitter:image":
